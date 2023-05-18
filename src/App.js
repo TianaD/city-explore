@@ -8,27 +8,65 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Axios from 'axios';
 
 function App() {
-  const [cityName, getCityName] = useState();
-  // const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_KEY}&q=${this.state.searchQuery}&format=json`;
-  let userInput = "Miami";
-  async function getLocation() {
-
-
-    let whatever = await Axios.get(`https://us1.locationiq.com/v1/search?key=pk.05bf7ae48044d1b823aa7091396448b8&q=${userInput}&format=json`).then((response) => {
-      return response.data;
-    })
-    console.log("whatever",whatever[0][0])
-    let returnedData = whatever.map((value, index) => {
-      return <h1>{value.display_name} {value.lat} {value.lon}</h1>
-    })
-    // console.log(whatever.lon)
-    getCityName(whatever[0])
-    // console.log(cityName)
+  const [cityName, setCityName] = useState("");
+  const [displayCityName, setDisplayCityName] = useState("");
+  const [locationError, setLocationError] = useState(false);
+  const [displayErrorMessage, setDisplayErrorMessage] = useState("");
+  const [cityMap, setCityMap] = useState(false);
+  const [latAndLon, setLatAndLon] = useState({});
+  const updateCityName = (event) => {
+    // event updates value of setCityName 
+    setCityName(event.target.value);
   }
-  // function updateCityName(event) {
-    // call getCityName function and pass in event.target.value 
-    // getCityName(event.target.value)
-  // }
+
+  //this is being sent by the user
+  let getLocation = async function() {
+    const locationAPI = `https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_KEY}&q=${cityName}&format=json`;
+    
+    // data fetched from API will update state 
+    let response;
+    try {
+      response = await Axios.get(locationAPI)
+      // console.log("reee")
+
+      // use data being retrieved and set equal to the city that will be displayed
+      setDisplayCityName(response.data[0])
+      setLocationError(false)
+      setCityMap(true)
+      // console.log(response.data[0])
+      setLatAndLon(response.data[0])
+    
+
+    // <================================================================================================> Catching Error Messages <========================================================================================>
+    }
+    catch (error) {
+ 
+      setLocationError(true)
+      setDisplayErrorMessage(error.response.status + ': ' + error.response.data.error) //returns error number status
+      setCityMap(false)
+
+    }
+
+    // <=====================================================================================================> Map Display <====================================================================================================>
+
+
+    // .then((response) => {
+    //   return response.data;
+    // })
+    // .catch((error) => {
+    //   if (error.response) {
+    //     console.log("Data :", error.response.data);
+    //     console.log("Status :" + error.response.status);
+    //   } else if (error.request) {
+    //     console.log(error.request);
+    //   } else {
+    //     console.log('Error', error.message);
+    //   }
+    // })
+
+  }
+
+  // this is where information is rendered -- in return 
   return (
 
 
@@ -39,11 +77,12 @@ function App() {
       {/* 1. API string */}
       {/* 2. variable = axios.get */}
       {/* 3. set variable to state */}
-      {/* Axios.getCityName("pk.05bf7ae48044d1b823aa7091396448b8") */}
-      {/* Axios.getCityName("https://gregarious-puppy-6c19d0.netlify.app") */}
-      <Form onSubmit={(event) => {
+      {/* Axios.setCityName("pk.05bf7ae48044d1b823aa7091396448b8") */}
+      {/* Axios.setCityName("https://gregarious-puppy-6c19d0.netlify.app") */}
+      <Form onSubmit={async (event) => {
         event.preventDefault()
-        getLocation()
+        await getLocation()
+
       }}>
         {/* this form contains a filter of the dif. num. of horns */}
         <Form.Group>
@@ -51,25 +90,24 @@ function App() {
           <Form.Label>
             City Name
           </Form.Label>
-          <Form.Control onChange={(event) => {
-            userInput = event.target.value;
-          }}
+          <Form.Control onChange = {updateCityName}
             type="text"
             placeholder="Enter City"
-          // set input event to control then use the getCityName function 
+          // set input event to control then use the setCityName function 
           />
           <Button type="submit" value="submit">
             EXPLORE
           </Button>
 
           {/* <input onClick={() => { console.log("You Clicked Explore") }} type="submit" value="Explore" /> */}
-          {/* <input onClick={() => {getCityName}} type="submit" value="Explore" /> */}
+          {/* <input onClick={() => {setCityName}} type="submit" value="Explore" /> */}
 
         </Form.Group>
 
       </Form>
       {/* <p>{cityName}</p> */}
-      <img src={cityName?.lon && cityName?.lat ? `https://maps.locationiq.com/v3/staticmap/?key=${process.env.REACT_APP_KEY}&center=${cityName?.lat},${cityName?.lon}&zoom=12` : ""} alt="map"></img>
+      <h1>{displayErrorMessage}</h1>
+      <img src={latAndLon?.lon && latAndLon?.lat ? `https://maps.locationiq.com/v3/staticmap/?key=${process.env.REACT_APP_KEY}&center=${latAndLon?.lat},${latAndLon?.lon}&zoom=12` : ""} alt="map"></img>
     </div>
 
 
