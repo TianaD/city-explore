@@ -1,12 +1,12 @@
 import React from 'react';
+import WeatherDay from './weatherDay';
 
 
 function Weather(props) {
     let weatherHTML = props.weatherData.map(function (element) {
         return (
             <>
-                <p>{element.description}</p>
-                <h1>{element.date}</h1>
+               <WeatherDay date={element.date} description={element.description} />
             </>
         )
 

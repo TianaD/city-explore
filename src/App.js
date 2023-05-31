@@ -10,6 +10,8 @@ import Movies from './movies';
 import { Carousel } from 'react-bootstrap';
 import Weather from './weather';
 
+const renderAPI = 'https://city-explore-api.onrender.com'
+
 function App() {
   const [cityName, setCityName] = useState("");
   const [displayCityName, setDisplayCityName] = useState("");
@@ -71,7 +73,7 @@ function App() {
   }
 
   let getForecast = async function () {
-    const forecastAPI = `http://localhost:3001/weather?lat=${latAndLon.lat}&lon=${latAndLon.lon}&searchQuery=${cityName}`;
+    const forecastAPI = `https://city-explore-api.onrender.com/weather?lat=${latAndLon.lat}&lon=${latAndLon.lon}&searchQuery=${cityName}`;
 
     // data fetched from API will update state 
     let response;
@@ -104,7 +106,7 @@ function App() {
   let getMovieData = async function () {
 
 
-    let movieResponse = Axios.get(`http://localhost:3001/movies?movie=${cityName}`)
+    let movieResponse = Axios.get(`https://city-explore-api.onrender.com/movies?movie=${cityName}`)
     movieResponse.then(function (res) {
       console.log(res.data)
       setMovies(res.data)
